@@ -7,7 +7,7 @@ export const brand = {
   fullName: 'Classic Trends Family Salon',
   tagline: 'Where Style Meets Perfection',
   subTagline: 'Premium Hair, Beauty & Grooming Services For Men, Women & Kids.',
-  logo: '/logo.jpeg',
+  logo: '/classic-trends-logo.png',
   phone: '9972608740',
   whatsapp: '9972608740',
   email: 'classictrends2026@gmail.com',
