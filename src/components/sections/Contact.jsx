@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { contact, brand, getWhatsAppURL } from '../../data/siteContent';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, Clock } from 'lucide-react';
+import { contact, brand, payment, getWhatsAppURL } from '../../data/siteContent';
 import { GoldDivider, SectionLabel, SectionHeading, GoldText } from '../ui/SectionHeader';
 import { staggerContainer, staggerItem, fadeUp, slideInLeft, slideInRight } from '../../utils/motionVariants';
 import { useToast, Toast } from '../ui/Toast';
@@ -27,6 +28,12 @@ const SERVICE_OPTIONS = [
 
 const InputField = ({ label, id, type = 'text', value, onChange, error, required, ...rest }) => (
   <div className="relative">
+    {type === 'date' && (
+      <Calendar className="pointer-events-none absolute bottom-3.5 right-4 z-10 h-5 w-5 text-white" aria-hidden="true" />
+    )}
+    {type === 'time' && (
+      <Clock className="pointer-events-none absolute bottom-3.5 right-4 z-10 h-5 w-5 text-white" aria-hidden="true" />
+    )}
     <label htmlFor={id} className="block font-body text-xs text-salon-muted mb-2 tracking-wide">
       {label} {required && <span className="text-gold-luxury">*</span>}
     </label>
@@ -41,7 +48,7 @@ const InputField = ({ label, id, type = 'text', value, onChange, error, required
         error
           ? 'border-red-500/60 focus:ring-red-500/30'
           : 'border-white/10 focus:border-gold-luxury/60 focus:ring-gold-luxury/20 hover:border-white/20'
-      }`}
+      } ${type === 'date' || type === 'time' ? 'pr-12' : ''}`}
       {...rest}
     />
     {error && <p className="mt-1 font-body text-xs text-red-400">{error}</p>}
@@ -106,13 +113,58 @@ const ContactInfoCard = ({ icon, label, value, href }) => (
   </motion.a>
 );
 
+const PaymentQRModal = ({ open, onClose }) => (
+  <AnimatePresence>
+    {open && (
+      <motion.div
+        className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Classic Trends advance payment QR code"
+        onClick={onClose}
+      >
+        <motion.div
+          className="relative w-full max-w-sm border border-gold-luxury/30 bg-salon-bg p-4 shadow-card"
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 18, scale: 0.98 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center border border-white/15 bg-salon-card/90 text-xl leading-none text-white/80 transition hover:border-gold-luxury/50 hover:text-white"
+            aria-label="Close payment QR"
+          >
+            ×
+          </button>
+          <p className="font-body text-[11px] font-bold uppercase tracking-widest text-gold-luxury">Advance Payment</p>
+          <h3 className="mt-1 pr-10 font-display text-xl font-bold text-white">Classic Trends Paytm UPI</h3>
+          <div className="mt-4 overflow-hidden border border-white/10 bg-white p-2">
+            <img src={payment.qrImage} alt="Classic Trends Paytm UPI QR code" className="h-auto w-full" />
+          </div>
+          <p className="mt-3 text-center font-body text-xs text-salon-muted">
+            UPI ID: <span className="text-gold-champagne">{payment.upiId}</span>
+          </p>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
 export const Contact = () => {
   const { toasts, addToast, removeToast } = useToast();
+  const [showPaymentQR, setShowPaymentQR] = useState(false);
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
     service: '',
+    date: '',
+    time: '',
     message: '',
   });
   const [errors, setErrors] = useState({});
@@ -123,6 +175,8 @@ export const Contact = () => {
     if (!form.phone.trim()) errs.phone = 'Phone number is required';
     else if (!/^[6-9]\d{9}$/.test(form.phone.trim())) errs.phone = 'Enter a valid 10-digit Indian mobile number';
     if (!form.service) errs.service = 'Please select a service';
+    if (!form.date) errs.date = 'Please select appointment date';
+    if (!form.time) errs.time = 'Please select appointment time';
     return errs;
   };
 
@@ -148,7 +202,9 @@ export const Contact = () => {
 
 👤 *Name:* ${form.name}
 📞 *Phone:* ${form.phone}${form.email ? `\n📧 *Email:* ${form.email}` : ''}
-💈 *Service:* ${form.service}${form.message ? `\n💬 *Message:* ${form.message}` : ''}
+💈 *Service:* ${form.service}
+📅 *Preferred Date:* ${form.date}
+⏰ *Preferred Time:* ${form.time}${form.message ? `\n💬 *Message:* ${form.message}` : ''}
 
 Please confirm my appointment. Thank you!`;
 
@@ -162,13 +218,14 @@ Please confirm my appointment. Thank you!`;
       duration: 5000,
     });
 
-    setForm({ name: '', phone: '', email: '', service: '', message: '' });
+    setForm({ name: '', phone: '', email: '', service: '', date: '', time: '', message: '' });
     setErrors({});
   };
 
   return (
     <>
       <Toast toasts={toasts} removeToast={removeToast} />
+      <PaymentQRModal open={showPaymentQR} onClose={() => setShowPaymentQR(false)} />
 
       <section id="contact" className="relative py-20 md:py-28 bg-gradient-to-b from-salon-bg to-[#011519] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-luxury/20 to-transparent" />
@@ -245,6 +302,38 @@ Please confirm my appointment. Thank you!`;
                   href={contact.instagram}
                 />
               </motion.div>
+
+              <div id="payment" className="mb-8 border border-gold-luxury/25 bg-salon-card/40 p-5">
+                <p className="font-body text-[11px] font-bold uppercase tracking-widest text-gold-luxury">
+                  Payment Section
+                </p>
+                <h4 className="mt-2 font-display text-xl font-bold text-white">Pay Advance & Confirm Booking</h4>
+                <p className="mt-2 font-body text-sm leading-6 text-salon-muted">
+                  {payment.condition}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentQR(true)}
+                  className="mt-5 block w-full overflow-hidden border border-white/10 bg-white p-2 transition hover:border-gold-luxury/60"
+                  aria-label="Open payment QR code"
+                >
+                  <img src={payment.qrImage} alt="Classic Trends Paytm UPI QR code" className="h-auto w-full" />
+                </button>
+
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="font-body text-xs text-white/70">
+                    UPI ID: <span className="text-gold-champagne">{payment.upiId}</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowPaymentQR(true)}
+                    className="border border-gold-luxury/50 bg-gold-luxury px-4 py-2.5 font-body text-xs font-bold uppercase tracking-widest text-emerald-dark transition hover:bg-gold-champagne"
+                  >
+                    Pay Advance
+                  </button>
+                </div>
+              </div>
 
               {/* Map */}
               <div className="border border-gold-luxury/20 overflow-hidden">
@@ -324,6 +413,27 @@ Please confirm my appointment. Thank you!`;
                       required
                     />
                     {errors.service && <p className="mt-1 font-body text-xs text-red-400">{errors.service}</p>}
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                    <InputField
+                      label="Preferred Date"
+                      id="date"
+                      type="date"
+                      value={form.date}
+                      onChange={handleChange}
+                      error={errors.date}
+                      required
+                    />
+                    <InputField
+                      label="Preferred Time"
+                      id="time"
+                      type="time"
+                      value={form.time}
+                      onChange={handleChange}
+                      error={errors.time}
+                      required
+                    />
                   </div>
 
                   <div className="mb-7">

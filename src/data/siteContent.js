@@ -458,6 +458,250 @@ export const womensPackages = [
 
 // ─── TESTIMONIALS ──────────────────────────────────────────
 
+export const payment = {
+  qrImage: '/payment-qr.jpeg',
+  upiId: 'paytm.s2g0yp7@pty',
+  merchantName: 'Classic Trends',
+  phone: '8660218950',
+  condition: 'Discounted prices and reward points are valid only for services confirmed with advance payment.',
+};
+
+const onlineAdvanceRewards = [
+  ['Hair Cut', 99, 0],
+  ['Shave', 49, 0],
+  ['Beard Trim', 69, 0],
+  ['Beard Shave', 99, 0],
+  ['Change of Style', 129, 6],
+  ['Kids Cut', 149, 6],
+  ['Kids Hair Cut', 149, 5],
+  ['Kids Change of Style', 129, 6],
+  ['Head Wash', 49, 0],
+  ['Fruit Colour', 199, 6],
+  ['Garnier Colour', 249, 8],
+  ['Loreal Colour', 499, 10],
+  ['Loreal Ammonia Free Colour', 599, 10],
+  ['Fashion Colour Per Streak', 599, 10],
+  ['Fashion Colour Global', 649, 10],
+  ['Beard Colour', 99, 0],
+  ['Cap Highlights Colour', 799, 20],
+  ['Damage Hair Spa', 599, 30],
+  ['Dandruff Hair Spa', 699, 30],
+  ['Hair Loss Hair Spa', 699, 30],
+  ['Hair Straightening Half', 1449, 40],
+  ['Hair Straightening Full', 1949, 50],
+  ['Coconut Oil (20 Min)', 199, 6],
+  ['Almond Oil (20 Min)', 199, 6],
+  ['Amravati Oil (20 Min)', 199, 6],
+  ['Navratna Oil (20 Min)', 199, 6],
+  ['Face Wash Normal', 49, 0],
+  ['Face Scrub Normal', 99, 0],
+  ['Face Scrub with Steam', 249, 6],
+  ['Face Bleach', 199, 6],
+  ['Face & Neck Bleach', 299, 8],
+  ['Face De-Tan O3+', 399, 10],
+  ['Face De-Tan Raga', 299, 8],
+  ['Face Peel Off Mask', 299, 8],
+  ['Face Cleanup', 399, 10],
+  ['Fruit Facial', 499, 12],
+  ['Wine Facial', 699, 50],
+  ['Gold Facial', 999, 100],
+  ['Diamond Facial', 999, 100],
+  ['Skin Lightening Facial', 1799, 120],
+  ['Skin Brightening Facial', 1999, 128],
+  ['10 Minutes', 100, 0],
+  ['15 Minutes', 150, 0],
+  ['20 Minutes', 200, 6],
+  ['25 Minutes', 250, 8],
+  ['30 Minutes', 300, 10],
+  ['Straight Cut', 149, 5],
+  ['U Shape', 199, 7],
+  ['V Shape', 199, 7],
+  ['Layer Cut', 399, 9],
+  ['Step Cut', 399, 9],
+  ['Feather Cut', 329, 8],
+  ['Advanced Hair Cut', 539, 10],
+  ['Eyebrows', 30, 0],
+  ['Forehead', 20, 0],
+  ['Upper Lip', 20, 0],
+  ['Chin', 20, 0],
+  ['Deep Neck', 199, 5],
+  ['Hand', 249, 6],
+  ['Under Arm', 70, 0],
+  ['Half Leg', 249, 6],
+  ['Full Leg', 399, 9],
+  ['Chin Wax', 40, 0],
+  ['Clean Up', 299, 6],
+  ['D-Tan', 349, 7],
+  ['Pearl Facial', 799, 16],
+  ['VLCC Facial', 1199, 35],
+  ['Lotus Facial', 1199, 35],
+  ['Hydra Facial', 1849, 50],
+  ['Papaya Facial', 601, 10],
+  ['Brightening Facial', 1199, 35],
+  ['Paraffin', 599, 10],
+  ['Wax Aroma', 499, 10],
+  ['O3', 999, 28],
+  ['Anti Dandruff Treatment', 1099, 32],
+  ['Hair Wash with Conditioner', 249, 6],
+  ['Hair Oil Massage', 249, 6],
+  ['Hair Spa', 1299, 35],
+  ['Highlights Per Streak', 249, 6],
+  ['Root Touch-up', 999, 28],
+  ['Root Touch-up Ammonia Free', 1099, 30],
+  ['Short', 1399, 38],
+  ['Medium', 2349, 60],
+  ['Long', 3199, 100],
+  ['Temporary Straightening', 549, 30],
+  ['Ironing (Shortâ€“Long)', '449-749', 20],
+  ['Fruit Fresh Facial', 649, 20],
+  ['Gold Glow Facial', 949, 39],
+  ['Pearl Glow Facial', 1349, 47],
+  ['De-Tan Facial', 1449, 50],
+  ['Bridal Facial', 2349, 100],
+  ['Clean-up', 549, 49],
+  ['Fruit Clean-up', 449, 38],
+  ['Gold Radiance Clean-up', 749, 52],
+  ['Pearl/Diamond Clean-up', 849, 52],
+  ['Wash & Blow Dry', 189, 6],
+  ['Wash & Deep Conditioning', 289, 8],
+  ['Straight Blow Dry (Shortâ€“Long)', '289-489', 8],
+  ['Moisturizing Hair Spa', 749, 40],
+  ['Repair/Damage Hair Spa', 949, 50],
+  ['Frizz Ease Hair Spa', 949, 50],
+  ['Dandruff Removing Spa', 949, 50],
+  ['Light Makeup', '1500-2500', 20],
+  ['HD Bridal Makeup', '4000-5000', 50],
+  ['Saree Pre-Plating', 350, 20],
+  ['Saree Draping', 500, 50],
+  ['Lehanga Draping', 500, 30],
+  ['Simple Mehendi (Both Hands)', 999, 40],
+  ['Bridal Mehendi (Both Hands)', 3499, 50],
+];
+
+const rewardsByName = new Map(onlineAdvanceRewards.map(([name, discountPrice, rewardPoints]) => [
+  name.toLowerCase(),
+  { discountPrice, rewardPoints },
+]));
+
+const addAdvanceRewards = (node) => {
+  if (Array.isArray(node)) {
+    node.forEach(addAdvanceRewards);
+    return;
+  }
+  if (!node || typeof node !== 'object') return;
+  if (node.name && rewardsByName.has(node.name.toLowerCase())) {
+    Object.assign(node, rewardsByName.get(node.name.toLowerCase()));
+  }
+  Object.values(node).forEach(addAdvanceRewards);
+};
+
+[
+  mensServices,
+  womensServices,
+  advancedHairServices,
+  hairWashStyling,
+  hairSpaServices,
+  skinCare,
+  makeupServices,
+  mehendiServices,
+].forEach(addAdvanceRewards);
+
+const setAdvanceRewards = (items, values) => {
+  items.forEach((item, index) => {
+    const [discountPrice, rewardPoints] = values[index];
+    Object.assign(item, { discountPrice, rewardPoints });
+  });
+};
+
+setAdvanceRewards(womensServices.bleaching.items, [
+  [249, 6],
+  [199, 5],
+  [299, 6],
+  [149, 3],
+]);
+
+setAdvanceRewards(womensServices.waxing.subsections[0].items, [
+  [249, 6],
+  [70, 0],
+  [249, 6],
+  [399, 9],
+]);
+
+setAdvanceRewards(womensServices.waxing.subsections[1].items, [
+  [349, 8],
+  [120, 0],
+  [349, 8],
+  [599, 10],
+  [40, 0],
+]);
+
+setAdvanceRewards(womensServices.manicure.items, [
+  [599, 10],
+  [499, 10],
+  [400, 0],
+  [999, 28],
+]);
+
+setAdvanceRewards(womensServices.pedicure.items, [
+  [599, 12],
+  [499, 10],
+  [500, 0],
+  [999, 28],
+]);
+
+setAdvanceRewards(advancedHairServices.coloring.global.items, [
+  [1399, 38],
+  [2349, 60],
+  [3199, 100],
+]);
+
+setAdvanceRewards(advancedHairServices.coloring.globalAmmoniaFree.items, [
+  [1449, 50],
+  [1959, 68],
+  [2949, 100],
+]);
+
+setAdvanceRewards(advancedHairServices.coloring.fullHighlights.items, [
+  [2949, 100],
+  [3449, 120],
+  [4449, 150],
+]);
+
+setAdvanceRewards(advancedHairServices.straightening.items, [
+  [3949, 120],
+  [6449, 149],
+  [6499, 149],
+]);
+
+setAdvanceRewards(advancedHairServices.keratin.items, [
+  [4949, 130],
+  [6949, 150],
+  [6949, 150],
+]);
+
+setAdvanceRewards(advancedHairServices.botox.items, [
+  [4449, 130],
+  [6449, 150],
+  [7949, 200],
+]);
+
+mensComboOffers.forEach((combo, index) => {
+  const rewards = [
+    { discountPrice: 299, rewardPoints: 6 },
+    { discountPrice: 399, rewardPoints: 8 },
+    { discountPrice: 329, rewardPoints: 8 },
+    { discountPrice: 649, rewardPoints: 10 },
+    { discountPrice: 799, rewardPoints: 12 },
+    { discountPrice: 999, rewardPoints: 18 },
+  ][index];
+  Object.assign(combo, rewards);
+});
+
+womensPackages[0].discountPrice = 949;
+womensPackages[0].rewardPoints = 20;
+womensPackages[1].discountPrice = 1999;
+womensPackages[1].rewardPoints = 30;
+
 export const testimonials = [
   {
     name: "Priya Reddy",
@@ -546,19 +790,6 @@ export const faqs = [
   },
 ];
 
-// ─── GALLERY TABS ──────────────────────────────────────────
-
-export const galleryTabs = [
-  "Men's Grooming",
-  "Women's Beauty",
-  "Hair Coloring",
-  "Keratin Treatment",
-  "Facials",
-  "Bridal Makeup",
-  "Mehendi",
-  "Salon Interior",
-];
-
 // ─── CONTACT ───────────────────────────────────────────────
 
 export const contact = {
@@ -599,8 +830,21 @@ export const getWhatsAppURL = (message) => {
   return `https://wa.me/${phone}?text=${encoded}`;
 };
 
-export const getServiceWhatsAppURL = (serviceName, price) => {
-  const priceText = price ? ` (₹${price})` : '';
-  const message = `Hi Classic Trends! I would like to book *${serviceName}*${priceText} service. Please confirm the appointment. Thank you!`;
+export const getServiceWhatsAppURL = (serviceName) => {
+  const message = `Hi Classic Trends! I would like to book *${serviceName}* service. Please confirm the appointment. Thank you!`;
+  return getWhatsAppURL(message);
+};
+
+export const getAdvanceServiceWhatsAppURL = (serviceName, discountedPrice, rewardPoints = 0) => {
+  const priceText = discountedPrice ? `*Discounted Price:* ₹${discountedPrice}` : '*Discounted Price:* Advance payment done';
+  const pointsText = rewardPoints > 0
+    ? `*Reward Points Earned:* ${rewardPoints} points redeemable on my next service.`
+    : '*Reward Points Earned:* 0 points.';
+  const message = `Hi Classic Trends! I have paid advance for *${serviceName}* service.
+
+${priceText}
+${pointsText}
+
+I will attach the advance payment screenshot. Please confirm my appointment. Thank you!`;
   return getWhatsAppURL(message);
 };
