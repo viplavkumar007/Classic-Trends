@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { getWhatsAppURL } from '../../data/siteContent';
 
-export const CTAStrip = () => {
+export const CTAStrip = ({ onBookNow }) => {
   const waURL = getWhatsAppURL('Hi Classic Trends! I would like to book an appointment. Please share available slots. Thank you!');
 
   return (
@@ -50,6 +50,10 @@ export const CTAStrip = () => {
               href={waURL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                onBookNow?.('Hi Classic Trends! I would like to book an appointment. Please share available slots. Thank you!', 'Book Appointment');
+              }}
               className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark font-body font-bold text-sm tracking-widest uppercase shadow-gold hover:shadow-gold-lg hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto justify-center"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}

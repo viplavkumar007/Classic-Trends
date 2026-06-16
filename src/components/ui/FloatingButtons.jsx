@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getWhatsAppURL } from '../../data/siteContent';
 
-export const FloatingButtons = () => {
+export const FloatingButtons = ({ onBookNow }) => {
   const [visible, setVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(null);
 
@@ -110,6 +110,11 @@ export const FloatingButtons = () => {
                 href={btn.href}
                 target={btn.href.startsWith('http') ? '_blank' : undefined}
                 rel={btn.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                onClick={(e) => {
+                  if (btn.id !== 'book') return;
+                  e.preventDefault();
+                  onBookNow?.('Hi! I want to book an appointment at Classic Trends Family Salon. Please confirm my slot.', 'Book Appointment');
+                }}
                 className={`flex items-center justify-center w-12 h-12 rounded-full shadow-card ${btn.color} ${btn.textColor || 'text-white'} transition-all duration-300`}
                 whileHover={{ scale: 1.15, y: -2 }}
                 whileTap={{ scale: 0.9 }}

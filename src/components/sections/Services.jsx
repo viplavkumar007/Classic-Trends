@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import {
   mensServices,
   mensComboOffers,
@@ -12,12 +13,11 @@ import {
   skinCare,
   womensPackages,
   payment,
-  getServiceWhatsAppURL,
-  getAdvanceServiceWhatsAppURL,
   getWhatsAppURL,
 } from '../../data/siteContent';
 import { staggerContainer, staggerItem, fadeUp } from '../../utils/motionVariants';
 import { GoldDivider, SectionLabel, SectionHeading, GoldText } from '../ui/SectionHeader';
+import { BookingLeadModal } from '../ui/BookingLeadModal';
 
 const formatPrice = (value) => {
   if (!value) return '';
@@ -26,11 +26,16 @@ const formatPrice = (value) => {
   return `₹${text}`;
 };
 
-const PaymentModal = ({ item, onClose }) => {
+const PaymentModal = ({ item, onClose, onConfirm }) => {
   if (!item) return null;
 
   const amount = item.discountPrice || item.price || item.priceRange || 'Advance';
-  const confirmURL = item.confirmURL || getAdvanceServiceWhatsAppURL(item.name, amount, item.rewardPoints || 0);
+  const confirmMessage = item.confirmMessage || `Hi Classic Trends! I have paid advance for *${item.name}* service.
+
+*Discounted Price:* ${formatPrice(amount)}
+*Reward Points Earned:* ${item.rewardPoints || 0} points redeemable on my next service.
+
+I will attach the advance payment screenshot. Please confirm my appointment. Thank you!`;
 
   return (
     <AnimatePresence>
@@ -57,7 +62,7 @@ const PaymentModal = ({ item, onClose }) => {
             className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center border border-white/15 bg-salon-card/90 text-xl leading-none text-white/80 transition hover:border-gold-luxury/50 hover:text-white"
             aria-label="Close payment QR"
           >
-            ×
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
           <div className="pr-10">
             <p className="font-body text-[11px] font-bold uppercase tracking-widest text-gold-luxury">Pay Advance</p>
@@ -75,7 +80,7 @@ const PaymentModal = ({ item, onClose }) => {
           </p>
           <button
             type="button"
-            onClick={() => window.open(confirmURL, '_blank')}
+            onClick={() => onConfirm(confirmMessage, item.name)}
             className="mt-4 w-full bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark px-4 py-3 font-body text-xs font-bold uppercase tracking-widest text-emerald-dark transition hover:shadow-gold"
           >
             Confirm on WhatsApp
@@ -136,17 +141,22 @@ const BookingDisclaimers = () => (
 const ServiceRow = ({ name, price, priceRange, discountPrice, rewardPoints = 0, onPayAdvance }) => {
   const displayPrice = price ? formatPrice(price) : priceRange;
   const onlinePrice = discountPrice ? formatPrice(discountPrice) : displayPrice;
-  const waURL = getServiceWhatsAppURL(name);
-  const confirmURL = getAdvanceServiceWhatsAppURL(name, discountPrice || price, rewardPoints);
+  const bookMessage = `Hi Classic Trends! I would like to book *${name}* service. Please confirm the appointment. Thank you!`;
+  const confirmMessage = `Hi Classic Trends! I have paid advance for *${name}* service.
+
+*Discounted Price:* ${formatPrice(discountPrice || price || priceRange)}
+*Reward Points Earned:* ${rewardPoints > 0 ? `${rewardPoints} points redeemable on my next service.` : '0 points.'}
+
+I will attach the advance payment screenshot. Please confirm my appointment. Thank you!`;
 
   return (
     <motion.div
       variants={staggerItem}
       className="group grid gap-4 border-b border-white/5 px-5 py-4 transition-all duration-200 hover:border-gold-luxury/20 hover:bg-gold-luxury/5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
-      onClick={() => window.open(waURL, '_blank')}
+      onClick={() => onPayAdvance({ name, message: bookMessage, mode: 'book' })}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && window.open(waURL, '_blank')}
+      onKeyDown={(e) => e.key === 'Enter' && onPayAdvance({ name, message: bookMessage, mode: 'book' })}
       title={`Book ${name}`}
       aria-label={`Book ${name} - ${onlinePrice}`}
     >
@@ -169,7 +179,7 @@ const ServiceRow = ({ name, price, priceRange, discountPrice, rewardPoints = 0, 
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            window.open(waURL, '_blank');
+            onPayAdvance({ name, message: bookMessage, mode: 'book' });
           }}
           className="min-h-10 border border-white/15 px-3 py-2 font-body text-[10px] font-bold uppercase tracking-widest text-white/80 transition hover:border-gold-luxury/50 hover:text-gold-luxury"
         >
@@ -179,7 +189,7 @@ const ServiceRow = ({ name, price, priceRange, discountPrice, rewardPoints = 0, 
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onPayAdvance({ name, price, priceRange, discountPrice, rewardPoints, confirmURL });
+            onPayAdvance({ name, price, priceRange, discountPrice, rewardPoints, confirmMessage, mode: 'advance' });
           }}
           className="min-h-10 border border-gold-luxury/40 px-3 py-2 font-body text-[10px] font-bold uppercase tracking-widest text-gold-luxury transition hover:bg-gold-luxury hover:text-emerald-dark"
         >
@@ -218,14 +228,12 @@ const ServiceCategory = ({ title, items, subsections, onPayAdvance }) => (
 const ComboCard = ({ title = 'Combo Package', price, discountPrice, rewardPoints = 0, services, popular, onPayAdvance }) => {
   const onlinePrice = discountPrice || price;
   const msg = `Hi Classic Trends! I would like to book *${title}* which includes: ${services.join(', ')}. Please confirm my appointment. Thank you!`;
-  const waURL = getWhatsAppURL(msg);
   const confirmMsg = `Hi Classic Trends! I have paid advance for *${title}* which includes: ${services.join(', ')}.
 
 *Discounted Price:* ₹${onlinePrice}
 *Reward Points Earned:* ${rewardPoints} points redeemable on my next service.
 
 I will attach the advance payment screenshot. Please confirm my appointment. Thank you!`;
-  const confirmURL = getWhatsAppURL(confirmMsg);
 
   return (
     <motion.div
@@ -257,7 +265,7 @@ I will attach the advance payment screenshot. Please confirm my appointment. Tha
       </ul>
       <div className="grid gap-2">
         <button
-          onClick={() => window.open(waURL, '_blank')}
+          onClick={() => onPayAdvance({ name: title, message: msg, mode: 'book' })}
           className={`w-full py-3 font-body text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
             popular
               ? 'bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark hover:shadow-gold'
@@ -268,7 +276,7 @@ I will attach the advance payment screenshot. Please confirm my appointment. Tha
         </button>
         <button
           type="button"
-          onClick={() => onPayAdvance({ name: title, price, discountPrice: onlinePrice, rewardPoints, confirmURL })}
+          onClick={() => onPayAdvance({ name: title, price, discountPrice: onlinePrice, rewardPoints, confirmMessage: confirmMsg, mode: 'advance' })}
           className="w-full border border-white/15 py-3 font-body text-xs font-bold uppercase tracking-widest text-white/80 transition hover:border-gold-luxury/50 hover:text-gold-luxury"
         >
           Pay Advance
@@ -281,14 +289,12 @@ I will attach the advance payment screenshot. Please confirm my appointment. Tha
 const WomensPackageCard = ({ title, price, discountPrice, rewardPoints = 0, services, popular, onPayAdvance }) => {
   const onlinePrice = discountPrice || price;
   const msg = `Hi Classic Trends! I would like to book the *${title}* package. Please confirm my appointment and let me know the available slots. Thank you!`;
-  const waURL = getWhatsAppURL(msg);
   const confirmMsg = `Hi Classic Trends! I have paid advance for the *${title}* package.
 
 *Discounted Price:* ₹${onlinePrice}
 *Reward Points Earned:* ${rewardPoints} points redeemable on my next service.
 
 I will attach the advance payment screenshot. Please confirm my appointment and let me know the available slots. Thank you!`;
-  const confirmURL = getWhatsAppURL(confirmMsg);
 
   return (
     <motion.div
@@ -320,7 +326,7 @@ I will attach the advance payment screenshot. Please confirm my appointment and 
       </ul>
       <div className="grid gap-2">
         <button
-          onClick={() => window.open(waURL, '_blank')}
+          onClick={() => onPayAdvance({ name: title, message: msg, mode: 'book' })}
           className={`w-full py-3 font-body text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
             popular
               ? 'bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark hover:shadow-gold'
@@ -331,7 +337,7 @@ I will attach the advance payment screenshot. Please confirm my appointment and 
         </button>
         <button
           type="button"
-          onClick={() => onPayAdvance({ name: title, price, discountPrice: onlinePrice, rewardPoints, confirmURL })}
+          onClick={() => onPayAdvance({ name: title, price, discountPrice: onlinePrice, rewardPoints, confirmMessage: confirmMsg, mode: 'advance' })}
           className="w-full border border-white/15 py-3 font-body text-xs font-bold uppercase tracking-widest text-white/80 transition hover:border-gold-luxury/50 hover:text-gold-luxury"
         >
           Pay Advance
@@ -351,10 +357,35 @@ const TABS = [
 export const Services = () => {
   const [activeTab, setActiveTab] = useState('mens');
   const [paymentItem, setPaymentItem] = useState(null);
+  const [bookingLead, setBookingLead] = useState(null);
+
+  const openLeadForm = (message, title) => {
+    setBookingLead({ message, title: title || 'Book Appointment' });
+  };
+
+  const handleBookingAction = (item) => {
+    if (item.mode === 'advance') {
+      setPaymentItem(item);
+      return;
+    }
+
+    openLeadForm(item.message, item.name);
+  };
+
+  const handlePaymentConfirm = (message, title) => {
+    setPaymentItem(null);
+    openLeadForm(message, title);
+  };
+
+  const handleLeadSubmit = (message) => {
+    window.open(getWhatsAppURL(message), '_blank');
+    setBookingLead(null);
+  };
 
   return (
     <section id="services" className="relative overflow-hidden bg-gradient-to-b from-salon-bg to-[#021a1f] py-20 md:py-28">
-      <PaymentModal item={paymentItem} onClose={() => setPaymentItem(null)} />
+      <PaymentModal item={paymentItem} onClose={() => setPaymentItem(null)} onConfirm={handlePaymentConfirm} />
+      <BookingLeadModal lead={bookingLead} onClose={() => setBookingLead(null)} onSubmit={handleLeadSubmit} />
       <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-luxury/20 to-transparent" />
       <div className="pointer-events-none absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-gold-luxury/3 blur-3xl" />
 
@@ -400,14 +431,14 @@ export const Services = () => {
           {activeTab === 'mens' && (
             <motion.div key="mens" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
               <div className="mb-14 grid gap-6 lg:grid-cols-2">
-                <ServiceCategory {...mensServices.hairCuts} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...mensServices.hairColours} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...mensServices.hairSpa} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...mensServices.straightening} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...mensServices.headMassage} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...mensServices.massageChair} onPayAdvance={setPaymentItem} />
+                <ServiceCategory {...mensServices.hairCuts} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...mensServices.hairColours} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...mensServices.hairSpa} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...mensServices.straightening} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...mensServices.headMassage} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...mensServices.massageChair} onPayAdvance={handleBookingAction} />
               </div>
-              <ServiceCategory {...mensServices.facials} onPayAdvance={setPaymentItem} />
+              <ServiceCategory {...mensServices.facials} onPayAdvance={handleBookingAction} />
 
               <div id="offers" className="mt-14">
                 <div className="mb-8 text-center">
@@ -417,7 +448,7 @@ export const Services = () => {
                 </div>
                 <motion.div className="grid gap-6 lg:grid-cols-2" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}>
                   {mensComboOffers.map((combo, i) => (
-                    <ComboCard key={i} {...combo} title={`Combo ${i + 1}`} onPayAdvance={setPaymentItem} />
+                    <ComboCard key={i} {...combo} title={`Combo ${i + 1}`} onPayAdvance={handleBookingAction} />
                   ))}
                 </motion.div>
               </div>
@@ -427,18 +458,18 @@ export const Services = () => {
           {activeTab === 'womens' && (
             <motion.div key="womens" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
               <div className="mb-6 grid gap-6 lg:grid-cols-2">
-                <ServiceCategory {...womensServices.hairCuts} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...womensServices.threading} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...womensServices.bleaching} onPayAdvance={setPaymentItem} />
+                <ServiceCategory {...womensServices.hairCuts} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...womensServices.threading} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...womensServices.bleaching} onPayAdvance={handleBookingAction} />
               </div>
               <div className="mb-6 grid gap-6 lg:grid-cols-2">
-                <ServiceCategory title={womensServices.waxing.title} subsections={womensServices.waxing.subsections} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...womensServices.manicure} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...womensServices.pedicure} onPayAdvance={setPaymentItem} />
+                <ServiceCategory title={womensServices.waxing.title} subsections={womensServices.waxing.subsections} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...womensServices.manicure} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...womensServices.pedicure} onPayAdvance={handleBookingAction} />
               </div>
               <div className="mb-6 grid gap-6 lg:grid-cols-2">
-                <ServiceCategory {...womensServices.facials} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...womensServices.hairTreatment} onPayAdvance={setPaymentItem} />
+                <ServiceCategory {...womensServices.facials} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...womensServices.hairTreatment} onPayAdvance={handleBookingAction} />
               </div>
 
               <div className="mt-14">
@@ -449,7 +480,7 @@ export const Services = () => {
                 </div>
                 <motion.div className="mx-auto grid max-w-2xl gap-5 sm:grid-cols-2" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
                   {womensPackages.map((pkg, i) => (
-                    <WomensPackageCard key={i} {...pkg} onPayAdvance={setPaymentItem} />
+                    <WomensPackageCard key={i} {...pkg} onPayAdvance={handleBookingAction} />
                   ))}
                 </motion.div>
               </div>
@@ -466,7 +497,7 @@ export const Services = () => {
                       <h4 className="font-body text-xs font-bold uppercase tracking-widest text-gold-luxury">Hair Coloring</h4>
                     </div>
                     <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}>
-                      {advancedHairServices.coloring.items.map((item, i) => <ServiceRow key={i} {...item} onPayAdvance={setPaymentItem} />)}
+                      {advancedHairServices.coloring.items.map((item, i) => <ServiceRow key={i} {...item} onPayAdvance={handleBookingAction} />)}
                     </motion.div>
                     {[advancedHairServices.coloring.global, advancedHairServices.coloring.globalAmmoniaFree, advancedHairServices.coloring.fullHighlights].map((sub, si) => (
                       <div key={si}>
@@ -474,7 +505,7 @@ export const Services = () => {
                           <p className="font-body text-xs font-semibold tracking-wide text-gold-champagne">{sub.subtitle}</p>
                         </div>
                         <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}>
-                          {sub.items.map((item, i) => <ServiceRow key={i} {...item} onPayAdvance={setPaymentItem} />)}
+                          {sub.items.map((item, i) => <ServiceRow key={i} {...item} onPayAdvance={handleBookingAction} />)}
                         </motion.div>
                       </div>
                     ))}
@@ -482,18 +513,18 @@ export const Services = () => {
                 </div>
 
                 <div className="space-y-5">
-                  <ServiceCategory {...advancedHairServices.tempStyling} onPayAdvance={setPaymentItem} />
-                  <ServiceCategory {...hairWashStyling} onPayAdvance={setPaymentItem} />
+                  <ServiceCategory {...advancedHairServices.tempStyling} onPayAdvance={handleBookingAction} />
+                  <ServiceCategory {...hairWashStyling} onPayAdvance={handleBookingAction} />
                 </div>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-2">
-                <ServiceCategory {...advancedHairServices.straightening} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...advancedHairServices.keratin} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...advancedHairServices.botox} onPayAdvance={setPaymentItem} />
-                <ServiceCategory {...hairSpaServices} onPayAdvance={setPaymentItem} />
+                <ServiceCategory {...advancedHairServices.straightening} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...advancedHairServices.keratin} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...advancedHairServices.botox} onPayAdvance={handleBookingAction} />
+                <ServiceCategory {...hairSpaServices} onPayAdvance={handleBookingAction} />
                 {Object.values(skinCare).map((cat, i) => (
-                  <ServiceCategory key={i} {...cat} onPayAdvance={setPaymentItem} />
+                  <ServiceCategory key={i} {...cat} onPayAdvance={handleBookingAction} />
                 ))}
               </div>
             </motion.div>
@@ -503,9 +534,9 @@ export const Services = () => {
             <motion.div key="bridal" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
               <div className="mb-10 grid gap-6 lg:grid-cols-2">
                 <div className="lg:col-span-2">
-                  <ServiceCategory {...makeupServices} onPayAdvance={setPaymentItem} />
+                  <ServiceCategory {...makeupServices} onPayAdvance={handleBookingAction} />
                 </div>
-                <ServiceCategory {...mehendiServices} onPayAdvance={setPaymentItem} />
+                <ServiceCategory {...mehendiServices} onPayAdvance={handleBookingAction} />
               </div>
 
               <motion.div

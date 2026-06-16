@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { brand } from '../../data/siteContent';
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 
@@ -16,7 +17,7 @@ const NAV_LINKS = [
 
 const SECTION_IDS = ['hero', 'about', 'services', 'offers', 'gallery', 'testimonials', 'faq', 'contact'];
 
-export const Navbar = () => {
+export const Navbar = ({ onBookNow }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const activeSection = useScrollSpy(SECTION_IDS);
@@ -114,6 +115,10 @@ export const Navbar = () => {
                 href={`https://wa.me/919972608740?text=${encodeURIComponent('Hi! I would like to book an appointment at Classic Trends Family Salon.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onBookNow?.('Hi! I would like to book an appointment at Classic Trends Family Salon.', 'Book Appointment');
+                }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark text-xs font-body font-bold tracking-widest uppercase hover:shadow-gold hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-luxury"
               >
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -176,7 +181,7 @@ export const Navbar = () => {
                   className="text-white/60 hover:text-white text-2xl leading-none"
                   aria-label="Close menu"
                 >
-                  ×
+                  <X className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
 
@@ -205,6 +210,11 @@ export const Navbar = () => {
                   href={`https://wa.me/919972608740?text=${encodeURIComponent('Hi! I would like to book an appointment at Classic Trends Family Salon.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMenuOpen(false);
+                    onBookNow?.('Hi! I would like to book an appointment at Classic Trends Family Salon.', 'Book Appointment');
+                  }}
                   className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark font-body font-bold text-sm tracking-widest uppercase"
                 >
                   Book Appointment

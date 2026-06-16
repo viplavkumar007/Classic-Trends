@@ -9,7 +9,7 @@ const ScissorIcon = () => (
   </svg>
 );
 
-export const Hero = () => {
+export const Hero = ({ onBookNow }) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
@@ -126,6 +126,10 @@ export const Hero = () => {
             href={whatsappBookURL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              e.preventDefault();
+              onBookNow?.('Hi! I would like to book an appointment at Classic Trends Family Salon. Please let me know the available slots.', 'Book Appointment');
+            }}
             className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark font-body font-bold text-sm tracking-widest uppercase hover:shadow-gold-lg hover:-translate-y-1 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-luxury w-full sm:w-auto justify-center"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}

@@ -29,7 +29,7 @@ const WhyCard = ({ icon, title, desc, index }) => (
   </motion.div>
 );
 
-export const About = () => (
+export const About = ({ onBookNow }) => (
   <section id="about" className="relative py-20 md:py-28 bg-salon-bg overflow-hidden">
     {/* Decorative background */}
     <div className="absolute top-0 right-0 w-96 h-96 bg-gold-luxury/3 rounded-full blur-3xl" />
@@ -78,6 +78,10 @@ export const About = () => (
               href={`https://wa.me/919972608740?text=${encodeURIComponent('Hi! I would like to book an appointment at Classic Trends Family Salon.')}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                onBookNow?.('Hi! I would like to book an appointment at Classic Trends Family Salon.', 'Book Appointment');
+              }}
               className="flex items-center justify-center gap-2 px-7 py-3.5 bg-gradient-to-r from-gold-dark via-gold-luxury to-gold-dark text-emerald-dark font-body font-bold text-xs tracking-widest uppercase hover:shadow-gold hover:-translate-y-0.5 transition-all duration-300"
             >
               ✦ Book Appointment

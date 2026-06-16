@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, X } from 'lucide-react';
 import { contact, brand, payment, getWhatsAppURL } from '../../data/siteContent';
 import { GoldDivider, SectionLabel, SectionHeading, GoldText } from '../ui/SectionHeader';
 import { staggerContainer, staggerItem, fadeUp, slideInLeft, slideInRight } from '../../utils/motionVariants';
@@ -139,7 +139,7 @@ const PaymentQRModal = ({ open, onClose }) => (
             className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center border border-white/15 bg-salon-card/90 text-xl leading-none text-white/80 transition hover:border-gold-luxury/50 hover:text-white"
             aria-label="Close payment QR"
           >
-            ×
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
           <p className="font-body text-[11px] font-bold uppercase tracking-widest text-gold-luxury">Advance Payment</p>
           <h3 className="mt-1 pr-10 font-display text-xl font-bold text-white">Classic Trends Paytm UPI</h3>

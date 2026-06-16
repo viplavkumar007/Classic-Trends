@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 export const Toast = ({ toasts, removeToast }) => {
   return (
@@ -57,7 +58,7 @@ const ToastItem = ({ toast, onRemove }) => {
         className="text-salon-muted hover:text-white transition-colors ml-2 flex-shrink-0"
         aria-label="Dismiss notification"
       >
-        ×
+        <X className="h-4 w-4" aria-hidden="true" />
       </button>
     </motion.div>
   );
